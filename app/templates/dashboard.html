@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-5">
+  <!-- Header Section -->
+  <div class="row mb-4">
+    <div class="col text-center">
+      <h2 class="display-4">Your Dashboard</h2>
+      <p class="lead">Manage your uploaded resources and account settings.</p>
+      <hr>
+    </div>
+  </div>
+
+  <!-- Quick Actions Section -->
+  <div class="row mb-4">
+    <div class="col text-center">
+      <!-- Buttons for quick actions -->
+      <a href="{{ url_for('main.upload') }}" class="btn btn-lg btn-success mx-2">Upload a New Resource</a>
+      <a href="{{ url_for('main.index') }}" class="btn btn-lg btn-info mx-2">Go to Home</a>
+      <a href="{{ url_for('main.login') }}" class="btn btn-lg btn-warning mx-2">Go to Login</a> <!-- Go to Login link -->
+    </div>
+  </div>
+
+  <!-- Uploaded Resources Section -->
+  <div class="row">
+    {% for res in resources %}
+      <div class="col-md-4 mb-4">
+        <div class="card shadow-lg">
+          <div class="card-body">
+            <h5 class="card-title">{{ res.title }}</h5>
+            <p class="card-text"><strong>Subject:</strong> {{ res.subject }}</p>
+            <a href="{{ url_for('static', filename='uploads/' ~ res.filename) }}" class="btn btn-outline-primary" download>Download</a>
+            <hr>
+            <small class="text-muted">Uploaded on {{ res.date_uploaded }}</small>
+          </div>
+        </div>
+      </div>
+    {% else %}
+      <div class="col-12">
+        <p class="text-muted text-center">You haven’t uploaded any resources yet.</p>
+      </div>
+    {% endfor %}
+  </div>
+</div>
+{% endblock %}
