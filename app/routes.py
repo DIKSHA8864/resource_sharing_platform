@@ -24,12 +24,23 @@ def upload():
     if form.validate_on_submit():
         file = form.file.data
         filename = secure_filename(file.filename)
-        file.save(os.path.join(current_app.config['UPLOAD_FOLDER'], filename))
+        
+        # Ensure the upload folder exists
+        upload_folder = current_app.config['UPLOAD_FOLDER']
+        
+        # Create the folder if it doesn't exist
+        if not os.path.exists(upload_folder):
+            os.makedirs(upload_folder)
 
+        # Save the file
+        file.save(os.path.join(upload_folder, filename))
+
+        # Add the resource to the database
         resource = Resource(title=form.title.data, subject=form.subject.data,
                             filename=filename, user_id=current_user.id)
         db.session.add(resource)
         db.session.commit()
+
         flash('File uploaded successfully!', 'success')
         return redirect(url_for('main.dashboard'))
     return render_template('upload.html', form=form)
