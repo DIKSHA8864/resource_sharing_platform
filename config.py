@@ -8,3 +8,4 @@ class Config:
     SQLALCHEMY_DATABASE_URI = 'mysql://root:abcd@localhost/resource_db'
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     UPLOAD_FOLDER = os.path.join(basedir, 'static', 'uploads')
+    ALLOWED_EXTENSIONS = {'pdf', 'docx', 'pptx', 'txt','jpg','png','csv'}
