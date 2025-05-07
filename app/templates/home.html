@@ -1,118 +1,129 @@
 {% extends "base.html" %}
 
 {% block content %}
-<nav class="navbar navbar-expand-lg navbar-dark bg-primary shadow-sm">
-  <div class="container-fluid">
-    <a class="navbar-brand fw-bold" href="{{ url_for('main.home') }}">📘 ShareSphere</a>
-    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-      <span class="navbar-toggler-icon"></span>
-    </button>
-    <div class="collapse navbar-collapse" id="navbarNav">
-      <ul class="navbar-nav ms-auto">
-        <li class="nav-item"><a class="nav-link active" href="{{ url_for('main.home') }}">🏠 Home</a></li>
-        <li class="nav-item"><a class="nav-link" href="{{ url_for('main.upload') }}">📤 Upload</a></li>
-        <li class="nav-item"><a class="nav-link" href="{{ url_for('main.dashboard') }}">📂 Dashboard</a></li>
-        {% if current_user.is_authenticated %}
-          <li class="nav-item"><a class="nav-link" href="{{ url_for('auth.logout') }}">🚪 Logout</a></li>
-        {% else %}
-          <li class="nav-item"><a class="nav-link" href="{{ url_for('auth.login') }}">🔐 Login</a></li>
-          <li class="nav-item"><a class="nav-link" href="{{ url_for('auth.register') }}">📝 Register</a></li>
-        {% endif %}
-      </ul>
+<div class="home-bg">
+  <nav class="navbar navbar-expand-lg navbar-dark bg-primary shadow-sm">
+    <div class="container-fluid">
+      <a class="navbar-brand fw-bold" href="{{ url_for('main.home') }}">📘 ShareSphere</a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav ms-auto">
+          <li class="nav-item"><a class="nav-link active" href="{{ url_for('main.home') }}">🏠 Home</a></li>
+          <li class="nav-item"><a class="nav-link" href="{{ url_for('main.upload') }}">📤 Upload</a></li>
+          <li class="nav-item"><a class="nav-link" href="{{ url_for('main.dashboard') }}">📂 Dashboard</a></li>
+          {% if current_user.is_authenticated %}
+            <li class="nav-item"><a class="nav-link" href="{{ url_for('auth.logout') }}">🚪 Logout</a></li>
+          {% else %}
+            <li class="nav-item"><a class="nav-link" href="{{ url_for('auth.login') }}">🔐 Login</a></li>
+            <li class="nav-item"><a class="nav-link" href="{{ url_for('auth.register') }}">📝 Register</a></li>
+          {% endif %}
+        </ul>
+      </div>
     </div>
-  </div>
-</nav>
+  </nav>
 
-<div class="container mt-5">
+  <div class="container mt-5">
 
-  <!-- Search and Filter -->
-  <form method="GET" action="{{ url_for('main.home') }}" class="row mb-4 g-3 align-items-center">
-    <div class="col-md-5">
-      <input type="text" name="search" class="form-control" placeholder="🔍 Search by title or subject..." value="{{ request.args.get('search', '') }}">
-    </div>
-    <div class="col-md-4">
-      <select name="subject" class="form-select">
-        <option value="">📁 All Subjects</option>
-        {% for subj in subjects %}
-          <option value="{{ subj }}" {% if request.args.get('subject') == subj %}selected{% endif %}>{{ subj }}</option>
-        {% endfor %}
-      </select>
-    </div>
-    <div class="col-md-3">
-      <button type="submit" class="btn btn-primary w-100"><i class="bi bi-filter-circle"></i> Filter</button>
-    </div>
-  </form>
+    <!-- Search and Subject Dropdown Filter -->
+    <form method="GET" action="{{ url_for('main.home') }}" class="row mb-4 g-3 align-items-center">
+      <div class="col-md-5">
+        <input type="text" name="search" class="form-control" placeholder="🔍 Search by title or subject..." value="{{ request.args.get('search', '') }}">
+      </div>
 
-  <!-- Header Section -->
-  <div class="text-center mb-5">
-    <h1 class="display-4 fw-semibold">📚 Welcome to ShareSphere</h1>
-    <p class="lead text-secondary">Find, Share, and Download Academic Resources Easily!</p>
-    <hr class="w-50 mx-auto">
-  </div>
-
-  <div class="text-center mb-4">
-    <a href="{{ url_for('main.upload') }}" class="btn btn-success btn-lg mx-2 shadow-sm">
-      <i class="bi bi-upload"></i> Upload Resource
-    </a>
-    <a href="{{ url_for('main.dashboard') }}" class="btn btn-primary btn-lg mx-2 shadow-sm">
-      <i class="bi bi-folder2-open"></i> View Dashboard
-    </a>
-  </div>
-
-  <h3 class="mb-4"><i class="bi bi-clock-history text-info"></i> Latest Shared Resources</h3>
-  <div class="row">
-    {% for res in resources %}
-      <div class="col-md-4 mb-4">
-        <div class="card h-100 shadow hover-shadow transition-ease">
-          <div class="card-body">
-            <h5 class="card-title text-dark">{{ res.title }}</h5>
-            <p class="card-text"><span class="badge bg-secondary">Subject: {{ res.subject }}</span></p>
-            <a href="{{ url_for('static', filename='uploads/' ~ res.filename) }}" class="btn btn-outline-primary btn-sm" download>
-              ⬇ Download
-            </a>
-          </div>
+      <div class="col-md-4">
+        <div class="dropdown w-100">
+          <button class="btn btn-white dropdown-toggle w-100 subject-btn" type="button" id="subjectDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+            📁 All Subjects
+          </button>
+          <ul class="dropdown-menu w-100" aria-labelledby="subjectDropdown">
+            {% for subj in subjects %}
+              <li>
+                <a class="dropdown-item" href="{{ url_for('main.home', subject=subj, search=request.args.get('search', '')) }}">
+                  {{ subj }}
+                </a>
+              </li>
+            {% endfor %}
+          </ul>
         </div>
       </div>
-    {% else %}
-      <div class="col-12 text-center text-muted">
-        <p><i class="bi bi-exclamation-circle"></i> No resources available yet.</p>
+
+      <div class="col-md-3">
+        <button type="submit" class="btn btn-primary w-100"><i class="bi bi-filter-circle"></i> Filter</button>
       </div>
-    {% endfor %}
-  </div>
+    </form>
 
-  <!-- Pagination -->
-  {% if pagination %}
-    <nav class="mt-4">
-      <ul class="pagination justify-content-center">
-        {% if pagination.has_prev %}
-          <li class="page-item">
-            <a class="page-link" href="{{ url_for('main.home', page=pagination.prev_num, search=request.args.get('search', ''), subject=request.args.get('subject', '')) }}">&laquo;</a>
-          </li>
-        {% else %}
-          <li class="page-item disabled"><span class="page-link">&laquo;</span></li>
-        {% endif %}
+    <!-- Header Section -->
+    <div class="text-center mb-5">
+      <h1 class="display-4 fw-semibold text-white">📚 Welcome to ShareSphere</h1>
+      <p class="lead text-light">Find, Share, and Download Academic Resources Easily!</p>
+      <hr class="w-50 mx-auto text-light">
+    </div>
 
-        {% for page_num in pagination.iter_pages(left_edge=2, right_edge=2, left_current=2, right_current=2) %}
-          {% if page_num %}
-            <li class="page-item {% if pagination.page == page_num %}active{% endif %}">
-              <a class="page-link" href="{{ url_for('main.home', page=page_num, search=request.args.get('search', ''), subject=request.args.get('subject', '')) }}">{{ page_num }}</a>
+    <div class="text-center mb-4">
+      <a href="{{ url_for('main.upload') }}" class="btn btn-success btn-lg mx-2 shadow-sm">
+        <i class="bi bi-upload"></i> Upload Resource
+      </a>
+      <a href="{{ url_for('main.dashboard') }}" class="btn btn-primary btn-lg mx-2 shadow-sm">
+        <i class="bi bi-folder2-open"></i> View Dashboard
+      </a>
+    </div>
+
+    <h3 class="mb-4 text-white"><i class="bi bi-clock-history text-info"></i> Latest Shared Resources</h3>
+    <div class="row">
+      {% for res in resources %}
+        <div class="col-md-4 mb-4">
+          <div class="card h-100 shadow hover-shadow transition-ease">
+            <div class="card-body">
+              <h5 class="card-title text-dark">{{ res.title }}</h5>
+              <p class="card-text"><span class="badge bg-secondary">Subject: {{ res.subject }}</span></p>
+              <a href="{{ url_for('static', filename='uploads/' ~ res.filename) }}" class="btn btn-outline-primary btn-sm" download>
+                ⬇ Download
+              </a>
+            </div>
+          </div>
+        </div>
+      {% else %}
+        <div class="col-12 text-center text-light">
+          <p><i class="bi bi-exclamation-circle"></i> No resources available yet.</p>
+        </div>
+      {% endfor %}
+    </div>
+
+    <!-- Pagination -->
+    {% if pagination %}
+      <nav class="mt-4">
+        <ul class="pagination justify-content-center">
+          {% if pagination.has_prev %}
+            <li class="page-item">
+              <a class="page-link" href="{{ url_for('main.home', page=pagination.prev_num, search=request.args.get('search', ''), subject=request.args.get('subject', '')) }}">&laquo;</a>
             </li>
           {% else %}
-            <li class="page-item disabled"><span class="page-link">…</span></li>
+            <li class="page-item disabled"><span class="page-link">&laquo;</span></li>
           {% endif %}
-        {% endfor %}
 
-        {% if pagination.has_next %}
-          <li class="page-item">
-            <a class="page-link" href="{{ url_for('main.home', page=pagination.next_num, search=request.args.get('search', ''), subject=request.args.get('subject', '')) }}">&raquo;</a>
-          </li>
-        {% else %}
-          <li class="page-item disabled"><span class="page-link">&raquo;</span></li>
-        {% endif %}
-      </ul>
-    </nav>
-  {% endif %}
+          {% for page_num in pagination.iter_pages(left_edge=2, right_edge=2, left_current=2, right_current=2) %}
+            {% if page_num %}
+              <li class="page-item {% if pagination.page == page_num %}active{% endif %}">
+                <a class="page-link" href="{{ url_for('main.home', page=page_num, search=request.args.get('search', ''), subject=request.args.get('subject', '')) }}">{{ page_num }}</a>
+              </li>
+            {% else %}
+              <li class="page-item disabled"><span class="page-link">…</span></li>
+            {% endif %}
+          {% endfor %}
 
+          {% if pagination.has_next %}
+            <li class="page-item">
+              <a class="page-link" href="{{ url_for('main.home', page=pagination.next_num, search=request.args.get('search', ''), subject=request.args.get('subject', '')) }}">&raquo;</a>
+            </li>
+          {% else %}
+            <li class="page-item disabled"><span class="page-link">&raquo;</span></li>
+          {% endif %}
+        </ul>
+      </nav>
+    {% endif %}
+  </div>
 </div>
 
 <style>
@@ -125,6 +136,27 @@
   .transition-ease {
     transition: all 0.3s ease-in-out;
   }
-</style>
 
+  .home-bg {
+    background: url("{{ url_for('static', filename='home1.jpg') }}") no-repeat center center fixed;
+    background-size: cover;
+    min-height: 100vh;
+    padding-bottom: 50px;
+  }
+
+  .subject-btn {
+    background-color: white !important; /* White background */
+    color: black !important; /* Black text */
+    border: 1px solid #ccc; /* Light border */
+  }
+
+  .subject-btn:hover {
+    background-color: #f8f9fa !important; /* Light grey on hover */
+  }
+
+  .subject-btn:focus {
+    background-color: #e2e6ea !important; /* Focus state with grey background */
+    border-color: #6c757d;
+  }
+</style>
 {% endblock %}

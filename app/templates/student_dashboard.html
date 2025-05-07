@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container mt-4">
+  <h3 class="mb-4">Welcome, {{ current_user.username }} (Student)</h3>
+  <div class="row">
+    {% if resources %}
+      {% for resource in resources %}
+        <div class="col-md-4 mb-3">
+          <div class="card">
+            <div class="card-body">
+              <h5 class="card-title">{{ resource.title }}</h5>
+              <p class="card-text"><strong>Subject:</strong> {{ resource.subject }}</p>
+              <a href="{{ url_for('main.download', filename=resource.filename) }}" class="btn btn-primary btn-sm">Download</a>
+            </div>
+          </div>
+        </div>
+      {% endfor %}
+    {% else %}
+      <p>No resources found.</p>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}
